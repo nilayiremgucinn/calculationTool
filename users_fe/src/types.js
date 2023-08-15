@@ -1,0 +1,5 @@
+class InputPage {
+    string title;
+
+
+}
