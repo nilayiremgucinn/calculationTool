@@ -34,9 +34,7 @@ export default function Admin(){
     }
 
     useEffect(()=>{
-        //setNumberDecided(false);
-        //setNumberOfInputs(0);
-        console.log('THINGS ARE GONNA BE ALRIGHT', numberDecided);
+        console.log('Mounted', numberDecided);
     }, [numberDecided])
 
     let createInputPage = async (data) => {

@@ -8,6 +8,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Login from './pages/Login'
 import Admin from './pages/Admin'
+import User from './pages/User';
 import { BrowserRouter as Router,Routes, Route, Link } from 'react-router-dom';
 
 
@@ -77,6 +78,7 @@ function App() {
                 <Route exact path='/' element={< h1>Home</h1>}></Route>
                 <Route exact path='/login' element={< Login True />}></Route>
                 <Route exact path='/admin' element={< Admin />}></Route>
+                <Route exact path='/app' element={< User />}></Route>
         </Routes>
         </div>
     </Router>
