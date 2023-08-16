@@ -3,9 +3,6 @@
 import os
 import sys
 
-from django.contrib.auth.models import User
-from calculationtool.settings import ADMIN_EMAIL, ADMIN_PASSWORD
-
 
 def main():
     """Run administrative tasks."""
@@ -22,5 +19,4 @@ def main():
 
 
 if __name__ == '__main__':
-    user = User.objects.create_user("john", ADMIN_EMAIL, ADMIN_PASSWORD)
     main()

@@ -43,5 +43,18 @@ class Input(models.Model):
     name = models.CharField(max_length=20)
     placeholder = models.CharField(max_length=40)
     coefficient = models.IntegerField()
+
+
+class OutputPage(models.Model):
+    page_id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=30)
+    description = models.TextField(max_length=100)
+    image = models.ImageField(null=True) #urlfield?
+    
+
+
+class Output(models.Model):
+    output_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=20)
     constant = models.IntegerField()
     
