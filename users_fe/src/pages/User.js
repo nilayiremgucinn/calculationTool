@@ -2,7 +2,6 @@ import Output from "../components/Output";
 import { useEffect, useState } from "react";
 import { Button, Container,  Stack, TextField , Typography} from "@mui/material";
 import { Box } from "@mui/system";
-import { toast, ToastContainer} from 'react-toastify';
 
 const DEFAULT_INPUT={
     input_id: 0,
@@ -25,13 +24,11 @@ export default function User(){
     const [readyToCalculate, setReadyToCalculate] = useState(false);
     const [inputValues, setInputValues] = useState([]);
     const [outputTotal, setOutputTotal] = useState(0);
-    const [loading, setLoading] = useState(false);
     const [data, setData] = useState([])
     const [pageData, setPageData] = useState(DEFAULT_INPUT_PAGE);
 
 
     const onClickNext = ()=> {
-        setLoading(true);
 
         let index = 0;
         let total = 0;
@@ -43,33 +40,29 @@ export default function User(){
             index += 1;
         });
         
-        setOutputTotal(total);
+        setOutputTotal(outputTotal + total);
         console.log(total);
         setNumberOfInputsEntered(numberOfInputsEntered + 1);
         console.log(numberOfInputsEntered);
         setPageData(data[numberOfInputsEntered]);
         setInputValues([]);
-        setLoading(false);
     }
 
     const onClickPrev = ()=> {
-        setLoading(true);
-
         let index = 0;
         let total = 0;
     
         let input_data = pageData.inputs;
         
-        input_data.array.forEach(input => {
-            total -= (input.coefficient * inputValues[index]);
+        input_data.forEach(input => {
+            total += (input.coefficient * inputValues[index]);
             index += 1;
         });
         
-        setOutputTotal(total);
+        setOutputTotal(outputTotal - total);
         setPageData(data[numberOfInputsEntered-1]);
         setInputValues([]);
         setNumberOfInputsEntered(numberOfInputsEntered - 1);
-        setLoading(false);
     }
 
     const changeHandler = (event) => {
@@ -77,7 +70,7 @@ export default function User(){
         const value = event.target.value;
 
         var input_data_ = [...inputValues];
-        input_data_.push(parseInt(value));
+        input_data_[index] = parseInt(value);
         setInputValues(input_data_);
     }
 
@@ -87,8 +80,9 @@ export default function User(){
             .then((data_arr) => {
                 setData(data_arr);
                 setPageData(data_arr[0]);
+                setInputValues(Array(pageData.inputs.length).fill(0));
             });
-    }, []);
+    }, [pageData.inputs.length]);
 
     switch(readyToCalculate){
         case true: // render output
@@ -119,7 +113,7 @@ export default function User(){
                                 </Typography>
 
                                 {pageData.inputs.map((input, index) =>
-                                    <Stack spacing={2} key='inputs' >
+                                    <Stack spacing={2} >
                                         <TextField type="number" sx={{width: '%100'}} key={index} onChange={changeHandler} label={input.name} placeholder={input.placeholder} variant="outlined" />
                                     </Stack>
                                 )}
@@ -136,18 +130,9 @@ export default function User(){
                             </Box>
                         </Container>
                     </Stack>
-                    <ToastContainer
-                        position="bottom-left"
-                        autoClose={5000}
-                        hideProgressBar={false}
-                        justifyContent='flex'
-                        newestOnTop={false}
-                        closeOnClick
-                        draggablePercent={50}
-                        pauseOnFocusLoss={false}
-                        draggable
-                    />
                 </Box>
             )
+        default:
+            break;
     }
 }   
