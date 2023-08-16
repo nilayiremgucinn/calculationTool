@@ -33,7 +33,7 @@ class InputPage(models.Model):
     page_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=30)
     description = models.TextField(max_length=100)
-    image = models.ImageField(null=True) #urlfield?
+    image = models.URLField(null=True) #urlfield?
     
 
 
@@ -49,7 +49,7 @@ class OutputPage(models.Model):
     page_id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=30)
     description = models.TextField(max_length=100)
-    image = models.ImageField(null=True) #urlfield?
+    image = models.URLField(null=True) #urlfield?
     
 
 

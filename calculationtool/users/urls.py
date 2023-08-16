@@ -1,5 +1,5 @@
 from django.urls import path
-from users.views import InputPageAPIView, AdminUserAPIView, AdminLogin, AdminView, AdminLogout, OutputPageAPIView
+from users.views import InputPageAPIView, AdminLogin, AdminView, AdminLogout, OutputPageAPIView
 
 urlpatterns = [
     path('admin', AdminView.as_view()),

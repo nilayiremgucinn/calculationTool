@@ -65,14 +65,22 @@ class InputPageAPIView(APIView):
             "description": description,
             "image": image
         }
+        print('cok yoruldum')
         inputs_data = request.data.get('inputs', None)
         serializer = self.serializer_class(data=post_data)
+        print(serializer.is_valid())
+        print(serializer.errors)
         if serializer.is_valid(raise_exception=True):
             input_page = serializer.create(clean_data=post_data)
+            print('whats goin ong')
+        
         for input_data in inputs_data:
+            input_data.pop('input_id')
+            print(input_data)
             input_data['input_page_id'] = input_page
             input_serializer = self.input_serializer_class(data=input_data)
             if input_serializer.is_valid(raise_exception=True):
+                print('look around')
                 inputs = input_serializer.create(clean_data=input_data)
             
         if input_page:
