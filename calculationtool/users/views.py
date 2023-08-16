@@ -165,12 +165,10 @@ class OutputPageAPIView(APIView):
 
     def post(self, request):
         title = request.data.get('title', None)
-        description = request.data.get('description', None)
         image = request.data.get('image', None)
 
         post_data = {
             "title": title, 
-            "description": description,
             "image": image
         }
         outputs_data = request.data.get('outputs', None)

@@ -7,5 +7,5 @@ urlpatterns = [
     path('logout', AdminLogout.as_view(), name='logout'),
 	path('input', InputPageAPIView.as_view(), name='inputpage'),
     #path('image/', ImageAPIView.as_view(), name=image),
-    path('output', OutputPageAPIView.as_view(), name='output'),
+    path('output', OutputPageAPIView.as_view(), name='outputpage'),
 ]
