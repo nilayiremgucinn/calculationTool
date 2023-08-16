@@ -418,13 +418,12 @@ export default function Admin(){
                         </Box>
                         </div>:
                         <div>
-                            {data.inputs.map((input, index) =>
+                            {data.outputs.map((output, index) =>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }} label="Input">
                                     <Stack spacing={2}>
-                                        <TextField sx={{width: '%80'}} value={input.name} name={index} onChange={changeHandlerOutputMode} id={FIELD_IDS.NAME} label={`Name ${index + 1}`} variant="outlined" />
-                                        <TextField sx={{width: '%100'}} value={input.placeholder} name={index} onChange={changeHandlerOutputMode} id={FIELD_IDS.PLACEHOLDER} label={`Placeholder ${index + 1}`} variant="outlined" />
+                                        <TextField sx={{width: '%80'}} value={output.name} name={index} onChange={changeHandlerOutputMode} id={FIELD_IDS.NAME} label={`Name ${index + 1}`} variant="outlined" />
                                         <Stack direction='row' sx={{width: '%100'}}>
-                                            <TextField type="number"  value={input.coefficient} key={'coeff'+ toString(index)} name={index} onChange={changeHandlerInputMode} id={FIELD_IDS.COEFFICIENT} label={`Coefficient ${index + 1}`} variant="filled"defaultValue={1} />
+                                            <TextField type="number"  value={input.coefficient} key={'coeff'+ toString(index)} name={index} onChange={changeHandlerOutputMode} id={FIELD_IDS.COEFFICIENT} label={`Coefficient ${index + 1}`} variant="filled"defaultValue={1} />
                                         </Stack>
                                     </Stack>
                                 </Box>

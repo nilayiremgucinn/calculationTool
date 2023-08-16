@@ -23,6 +23,28 @@ const DEFAULT_OUTPUT_PAGE ={
 export default function Output(totals){
     const [pageData, setPageData] = useState(DEFAULT_OUTPUT_PAGE);
 
+    let getOutputPages = async () => {
+        try {
+            let response = await fetch('http://127.0.0.1:8000/api/output', {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            }).then(data => data.json());
+
+            setPageData(response[0]);
+        
+            toast.success("Input pages received.");
+        } catch (error) {
+            toast.error("Failed to get input page");
+        }
+    }
+
+    useEffect(()=>{
+        getOutputPages();
+        console.log(pageData);
+    }, []);
+
     return (
         <Box sx={{paddingTop: 25}}>
             <Stack direction='row' alignItems='center' justifyContent='center'>
@@ -48,11 +70,10 @@ export default function Output(totals){
                             {pageData.description}
                         </Typography>
 
-                        {pageData.outputs.map((output, index) =>
-                            <Typography variant="subtitle2" component="div" key='description' >
-                                {totals[index]}
-                            </Typography>
-                        )}
+                        <Typography variant="subtitle2" component="div" key='description' >
+                            {totals}
+                        </Typography>
+
                     </Stack>
                 </Container>
             </Stack>
