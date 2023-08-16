@@ -71,7 +71,7 @@ export default function Output(totals){
                         </Typography>
 
                         <Typography variant="subtitle2" component="div" key='description' >
-                            {totals}
+                            {parseInt(totals)}
                         </Typography>
 
                     </Stack>

@@ -237,17 +237,17 @@ export default function Admin(){
         const id = event.target.id;
         const index = event.target.name;
         const value = event.target.value;
-        var _data_ = [...data.inputs] ;
+        var _data_ = [...data.outputs] ;
 
         switch (id) {
             case FIELD_IDS.NAME:           
                 _data_[index]['name'] = value;
-                setData({ ...data, 'inputs': _data_ });
+                setData({ ...data, 'outputs': _data_ });
                 console.log(data);
                 break;
             case FIELD_IDS.CONSTANT:
                 _data_[index]['constant'] = parseFloat(value);
-                setData({ ...data, 'inputs': _data_ });
+                setData({ ...data, 'outputs': _data_ });
                 break;
             default:
                 break;
@@ -269,12 +269,12 @@ export default function Admin(){
     }
 
     const onDoneClick = () =>{
-        if(confMode == ConfigurationMode.AddMode){
+        if(confMode == ConfigurationMode.OutputAdd){
             createOutputPage();
             setData(DEFAULT_INPUT_PAGE);
             setConfMode(ConfigurationMode.NoConfiguration);
         }
-        else if(confMode == ConfigurationMode.EditMode){
+        else if(confMode == ConfigurationMode.OutputEdit){
             setData(DEFAULT_INPUT_PAGE);
             setConfMode(ConfigurationMode.NoConfiguration);
         } 
@@ -423,7 +423,7 @@ export default function Admin(){
                                     <Stack spacing={2}>
                                         <TextField sx={{width: '%80'}} value={output.name} name={index} onChange={changeHandlerOutputMode} id={FIELD_IDS.NAME} label={`Name ${index + 1}`} variant="outlined" />
                                         <Stack direction='row' sx={{width: '%100'}}>
-                                            <TextField type="number"  value={input.coefficient} key={'coeff'+ toString(index)} name={index} onChange={changeHandlerOutputMode} id={FIELD_IDS.COEFFICIENT} label={`Coefficient ${index + 1}`} variant="filled"defaultValue={1} />
+                                            <TextField type="number"  value={output.constant} name={index} onChange={changeHandlerOutputMode} id={FIELD_IDS.CONSTANT} label={`Constant ${index + 1}`} variant="filled"defaultValue={1} />
                                         </Stack>
                                     </Stack>
                                 </Box>
@@ -454,16 +454,16 @@ export default function Admin(){
                     </Backdrop>
 
                     <ToastContainer
-                    position="bottom-left"
-                    autoClose={5000}
-                    hideProgressBar={false}
-                    justifyContent='flex'
-                    newestOnTop={false}
-                    closeOnClick
-                    draggablePercent={50}
-                    pauseOnFocusLoss={false}
-                    draggable
-                />
+                        position="bottom-left"
+                        autoClose={5000}
+                        hideProgressBar={false}
+                        justifyContent='flex'
+                        newestOnTop={false}
+                        closeOnClick
+                        draggablePercent={50}
+                        pauseOnFocusLoss={false}
+                        draggable
+                    />
             
                 </Container >
             )
