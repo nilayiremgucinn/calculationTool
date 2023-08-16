@@ -18,7 +18,7 @@ const DEFAULT_INPUT_PAGE = {
     page_id: 0,
     title: "",
     description: "",
-    image: "",
+    image: "https://images.pexels.com/photos/20787/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=350",
     inputs: [DEFAULT_INPUT]
 }
 
@@ -32,7 +32,7 @@ const DEFAULT_OUTPUT_PAGE = {
     page_id: 0,
     title: "",
     description: "",
-    image: "",
+    image: "https://images.pexels.com/photos/20787/pexels-photo.jpg?auto=compress&cs=tinysrgb&h=350",
     outputs: [DEFAULT_OUTPUT]
 }
 
@@ -86,6 +86,22 @@ export default function Admin(){
           }
     }
 
+    let createOutputPage = async () => {
+        let response = await fetch('http://127.0.0.1:8000/api/output', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        if (response.status === 200) {
+            toast.success("Output page created.");
+          } else {
+            toast.error("Failed to create output page. Please try again!");
+          }
+    }
+
     let getInputPages = async () => {
         try {
             let response = await fetch('http://127.0.0.1:8000/api/input', {
@@ -106,6 +122,23 @@ export default function Admin(){
             toast.success("Input pages received.");
         } catch (error) {
             toast.error("Failed to get input page");
+        }
+    }
+
+    let getOutputPages = async () => {
+        try {
+            let response = await fetch('http://127.0.0.1:8000/api/output', {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            }).then(data => data.json());
+
+            setData(response[0]);
+            toast.success("Output pages received.");
+
+        } catch (error) {
+            toast.error("Failed to get output page");
         }
     }
 
@@ -154,6 +187,22 @@ export default function Admin(){
         let input_data_ = data.inputs.slice();
         input_data_.splice(input_data_.length - 1, 1);
         setData({ ...data, 'inputs': input_data_ });
+
+    }
+
+    const addOutputHandler = () => {
+
+        let _data_ = data.outputs.slice();
+        _data_.push(DEFAULT_OUTPUT);
+        setData({ ...data, 'outputs': _data_ });
+
+    }
+
+    const removeOutputHandler = () => {
+
+        let _data_ = data.outputs.slice();
+        _data_.splice(_data_.length - 1, 1);
+        setData({ ...data, 'outputs': _data_ });
 
     }
 
@@ -213,6 +262,7 @@ export default function Admin(){
             setConfMode(ConfigurationMode.OutputAdd);
         }
         else if(confMode == ConfigurationMode.EditMode){
+            getOutputPages();
             setData(DEFAULT_OUTPUT_PAGE);
             setConfMode(ConfigurationMode.OutputEdit);
         } 
@@ -242,6 +292,7 @@ export default function Admin(){
     const onContinueClick= () => {
         setConfMode(ConfigurationMode.EditMode);
         getInputPages();
+        getOutputPages();
         
     }
 

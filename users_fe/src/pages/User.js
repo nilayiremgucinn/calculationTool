@@ -9,7 +9,6 @@ const DEFAULT_INPUT={
     input_id: 0,
     name: "",
     placeholder: "",
-    constant: 0,
     coefficient: 1,
 }
 
