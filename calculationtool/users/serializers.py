@@ -13,7 +13,6 @@ class AdminLoginSerializer (serializers.ModelSerializer):
     email = serializers.EmailField()
     password = serializers.CharField()
     def check_user(self, clean_data):
-        print(clean_data['password'])
         user = authenticate(username=clean_data['email'], password=clean_data['password'])
         if not user:
             raise ValidationError('User not found')
@@ -56,7 +55,7 @@ class OutputPageSerializer (serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, clean_data):
-        page_obj = OutputPage.objects.create(title=clean_data['title'])
+        page_obj = OutputPage.objects.create(title=clean_data['title'], description=clean_data['description'])
         page_obj.image = clean_data['image']
         page_obj.save()
         return page_obj

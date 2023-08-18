@@ -65,22 +65,18 @@ class InputPageAPIView(APIView):
             "description": description,
             "image": image
         }
-        print('cok yoruldum')
+
         inputs_data = request.data.get('inputs', None)
         serializer = self.serializer_class(data=post_data)
-        print(serializer.is_valid())
-        print(serializer.errors)
         if serializer.is_valid(raise_exception=True):
             input_page = serializer.create(clean_data=post_data)
-            print('whats goin ong')
+
         
         for input_data in inputs_data:
             input_data.pop('input_id')
-            print(input_data)
             input_data['input_page_id'] = input_page
             input_serializer = self.input_serializer_class(data=input_data)
             if input_serializer.is_valid(raise_exception=True):
-                print('look around')
                 inputs = input_serializer.create(clean_data=input_data)
             
         if input_page:
@@ -103,7 +99,6 @@ class InputPageAPIView(APIView):
                inputs = Input.objects.filter(input_page_id=page['page_id'])
                input_serializer = self.input_serializer_class(inputs, many=True)
                page['inputs'] = input_serializer.data
-               print(page["inputs"])
             return Response(page_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({'message': 'No pages were configured'}, status=status.HTTP_204_NO_CONTENT)
@@ -142,7 +137,6 @@ class InputPageAPIView(APIView):
                 inputObj.name = input['name']
                 inputObj.placeholder= input['placeholder']
                 inputObj.coefficient = input['coefficient']
-                inputObj.constant = input['constant']
                 inputObj.save()
   
         return Response({'message': 'Update completed!'}, status=status.HTTP_200_OK)
@@ -165,10 +159,12 @@ class OutputPageAPIView(APIView):
 
     def post(self, request):
         title = request.data.get('title', None)
+        description = request.data.get('description', None)
         image = request.data.get('image', None)
 
         post_data = {
-            "title": title, 
+            "title": title,
+            "description": description, 
             "image": image
         }
         outputs_data = request.data.get('outputs', None)
@@ -200,7 +196,6 @@ class OutputPageAPIView(APIView):
                outputs = Output.objects.all()
                output_serializer = self.output_serializer_class(outputs, many=True)
                page['outputs'] = output_serializer.data
-               print(page["outputs"])
             return Response(page_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({'message': 'No pages were configured'}, status=status.HTTP_204_NO_CONTENT)
