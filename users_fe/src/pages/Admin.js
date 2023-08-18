@@ -1,4 +1,4 @@
-import { Backdrop, Button, CircularProgress, Container, FormControl, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Button, Container, FormControl, Paper, Stack, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from 'react-toastify';
@@ -49,8 +49,8 @@ export default function Admin(){
     const [numberOfEntries, setNumberOfEntries] = useState(0);
     const [confMode, setConfMode] = useState(ConfigurationMode.NoConfiguration);
     const [data, setData] = useState(DEFAULT_INPUT_PAGE);
+    const [outputData, setOutputData] = useState(DEFAULT_OUTPUT_PAGE);
     const [authenticated, setAuthenticated] = useState(true);
-    const [loading, setLoading] = useState(false);
     const [pageArray, setPageArray] = useState([]);
     const [pageIndex, setPageIndex] = useState(0);
 
@@ -62,12 +62,12 @@ export default function Admin(){
     }
 
     useEffect(()=>{
-        // const loggedInUser = localStorage.getItem("authenticated");
-        // if (loggedInUser) {
-        //     setAuthenticated(loggedInUser);
-        // }
-        setAuthenticated(true);
-    }, [pageIndex]);
+        const loggedInUser = localStorage.getItem("authenticated");
+        if (loggedInUser) {
+            setAuthenticated(loggedInUser);
+        }
+        //setAuthenticated(true);
+    }, []);
 
     let createInputPage = async () => {
         setNumberOfEntries(numberOfEntries + 1);
@@ -102,22 +102,19 @@ export default function Admin(){
           }
     }
 
-    let getInputPages = async () => {
+    let getInputPages = () => {
         try {
-            let response = await fetch('http://127.0.0.1:8000/api/input', {
+            fetch('http://127.0.0.1:8000/api/input', {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json'
-            },
-            }).then(data => data.json());
-            console.log(response);
-
-            setPageArray(response);
-            console.log(pageArray);
-            if (pageArray.length){
-                setData(pageArray[0]);
-                console.log(data);
-            }
+            },})
+            .then(data => data.json())
+            .then((newData) =>{
+                console.log(newData);
+                setPageArray(newData);
+                setData(newData[0]);
+            });
         
             toast.success("Input pages received.");
         } catch (error) {
@@ -125,16 +122,19 @@ export default function Admin(){
         }
     }
 
-    let getOutputPages = async () => {
+    let getOutputPages = () => {
         try {
-            let response = await fetch('http://127.0.0.1:8000/api/output', {
+            fetch('http://127.0.0.1:8000/api/output', {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json'
-            },
-            }).then(data => data.json());
+            },})
+            .then(data => data.json())
+            .then((newData) => {
+                console.log(newData);
+                setOutputData(newData[0]);
+            });
 
-            setData(response[0]);
             toast.success("Output pages received.");
 
         } catch (error) {
@@ -209,7 +209,7 @@ export default function Admin(){
     const changeHandlerInputMode = (event) => {
 
         const id = event.target.id;
-        const index = event.target.name;
+        const index = event.target.tabIndex;
         const value = event.target.value;
         var _data_ = [...data.inputs] ;
 
@@ -217,7 +217,6 @@ export default function Admin(){
             case FIELD_IDS.NAME:           
                 _data_[index]['name'] = value;
                 setData({ ...data, 'inputs': _data_ });
-                console.log(data);
                 break;
             case FIELD_IDS.PLACEHOLDER:
                 _data_[index]['placeholder'] = value;
@@ -235,7 +234,7 @@ export default function Admin(){
     const changeHandlerOutputMode = (event) => {
 
         const id = event.target.id;
-        const index = event.target.name;
+        const index = event.target.tabIndex;
         const value = event.target.value;
         var _data_ = [...data.outputs] ;
 
@@ -243,7 +242,6 @@ export default function Admin(){
             case FIELD_IDS.NAME:           
                 _data_[index]['name'] = value;
                 setData({ ...data, 'outputs': _data_ });
-                console.log(data);
                 break;
             case FIELD_IDS.CONSTANT:
                 _data_[index]['constant'] = parseFloat(value);
@@ -256,25 +254,25 @@ export default function Admin(){
     }
     
     const onOutputClick = () => {
-        if(confMode == ConfigurationMode.AddMode){
+        if(confMode === ConfigurationMode.AddMode){
             createInputPage();
-            setData(DEFAULT_OUTPUT_PAGE);
+            //setData(DEFAULT_OUTPUT_PAGE);
             setConfMode(ConfigurationMode.OutputAdd);
         }
-        else if(confMode == ConfigurationMode.EditMode){
+        else if(confMode === ConfigurationMode.EditMode){
             getOutputPages();
-            setData(DEFAULT_OUTPUT_PAGE);
+            //setData(DEFAULT_OUTPUT_PAGE);
             setConfMode(ConfigurationMode.OutputEdit);
         } 
     }
 
     const onDoneClick = () =>{
-        if(confMode == ConfigurationMode.OutputAdd){
+        if(confMode === ConfigurationMode.OutputAdd){
             createOutputPage();
             setData(DEFAULT_INPUT_PAGE);
             setConfMode(ConfigurationMode.NoConfiguration);
         }
-        else if(confMode == ConfigurationMode.OutputEdit){
+        else if(confMode === ConfigurationMode.OutputEdit){
             setData(DEFAULT_INPUT_PAGE);
             setConfMode(ConfigurationMode.NoConfiguration);
         } 
@@ -290,24 +288,24 @@ export default function Admin(){
     }
 
     const onContinueClick= () => {
-        setConfMode(ConfigurationMode.EditMode);
         getInputPages();
         getOutputPages();
+        setConfMode(ConfigurationMode.EditMode);
         
     }
 
     const onNextClick = ()=> {
         setPageIndex(pageIndex + 1);
-        setPageArray(pageArray[pageIndex]);
+        setData(pageArray[pageIndex+1]);
     }
 
     const onPrevClick = ()=> {
         setPageIndex(pageIndex - 1);
-        setPageArray(data[pageIndex]);
+        setData(pageArray[pageIndex-1]);
     }
 
     if (authenticated){
-        if(confMode == ConfigurationMode.NoConfiguration){            
+        if(confMode === ConfigurationMode.NoConfiguration){            
             return (
                 <Container maxWidth="md" sx={{
                     display: 'flex',
@@ -350,7 +348,7 @@ export default function Admin(){
                 />
                 </Container>
             );
-        }else {
+        }else if((confMode===ConfigurationMode.AddMode) || (confMode===ConfigurationMode.EditMode)) {
             return (
                 <Container maxWidth="md" sx={{
                     display: 'flex',
@@ -377,26 +375,25 @@ export default function Admin(){
             
                         <TextField multiline rows={1} value={data.title} onChange={(e) => { setData({ ...data, 'title': e.target.value }) }} placeholder="Edit title" label="Title" variant="outlined" />
                         <TextField multiline rows={10} value={data.description} onChange={(e) => { setData({ ...data, 'description': e.target.value }) }} placeholder="Edit description" label="Description" variant="outlined"/>
-    
-                        {((confMode===ConfigurationMode.AddMode) || (confMode===ConfigurationMode.EditMode))?
+                  
                         <div>
                             {data.inputs.map((input, index) =>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }} label="Input">
-                                <Stack spacing={2}>
-                                    <TextField sx={{width: '%80'}} value={input.name} name={index} onChange={changeHandlerInputMode} id={FIELD_IDS.NAME} label={`Name ${index + 1}`} variant="outlined" />
-                                    <TextField sx={{width: '%100'}} value={input.placeholder} name={index} onChange={changeHandlerInputMode} id={FIELD_IDS.PLACEHOLDER} label={`Placeholder ${index + 1}`} variant="outlined" />
-                                    <Stack direction='row' sx={{width: '%100'}}>
-                                        <TextField type="number"  value={input.coefficient} key={'coeff'+ toString(index)} name={index} onChange={changeHandlerInputMode} id={FIELD_IDS.COEFFICIENT} label={`Coefficient ${index + 1}`} variant="filled"defaultValue={1} />
+                                <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }} label="Input" key={index}>
+                                    <Stack spacing={2}>
+                                        <TextField sx={{width: '%80'}} value={input.name} tabIndex={index} onChange={changeHandlerInputMode} id={FIELD_IDS.NAME} label={`Name ${index + 1}`} variant="outlined" />
+                                        <TextField sx={{width: '%100'}} value={input.placeholder} tabIndex={index} onChange={changeHandlerInputMode} id={FIELD_IDS.PLACEHOLDER} label={`Placeholder ${index + 1}`} variant="outlined" />
+                                        <Stack direction='row' sx={{width: '%100'}}>
+                                            <TextField type="number"  value={input.coefficient} tabIndex={index} onChange={changeHandlerInputMode} id={FIELD_IDS.COEFFICIENT} label={`Coefficient ${index + 1}`} variant="filled" />
+                                        </Stack>
                                     </Stack>
-                                </Stack>
-                            </Box>
+                                </Box>
                         )}
                         <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
                             <Button color='primary' onClick={addInputHandler} endIcon={<Add />}>Add Input</Button>
                             <Button color='secondary' onClick={removeInputHandler} endIcon={<Close />}>Remove Input</Button>
                         </Box>
                         <Box sx={{  width:'%100', alignContent: "stretch"}}>
-                            {(confMode == ConfigurationMode.EditMode)?
+                            {(confMode === ConfigurationMode.EditMode)?
                                 <Stack direction='row'>
                                     {pageIndex>0?
                                         <Button sx={{alignItems: "flex-start"}} onClick={onPrevClick} variant="contained">Prev</Button>:
@@ -416,42 +413,8 @@ export default function Admin(){
                                 </Stack>
                             }
                         </Box>
-                        </div>:
-                        <div>
-                            {data.outputs.map((output, index) =>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }} label="Input">
-                                    <Stack spacing={2}>
-                                        <TextField sx={{width: '%80'}} value={output.name} name={index} onChange={changeHandlerOutputMode} id={FIELD_IDS.NAME} label={`Name ${index + 1}`} variant="outlined" />
-                                        <Stack direction='row' sx={{width: '%100'}}>
-                                            <TextField type="number"  value={output.constant} name={index} onChange={changeHandlerOutputMode} id={FIELD_IDS.CONSTANT} label={`Constant ${index + 1}`} variant="filled"defaultValue={1} />
-                                        </Stack>
-                                    </Stack>
-                                </Box>
-                            )}
-                            <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                                <Button color='primary' onClick={addOutputHandler} endIcon={<Add />}>Add Output</Button>
-                                <Button color='secondary' onClick={removeOutputHandler} endIcon={<Close />}>Remove Output</Button>
-                            </Box>
-                            <Box sx={{  width:'%100', alignContent: "stretch"}}>
-                                {(confMode == ConfigurationMode.EditMode)?
-                                    <Stack direction='row'>
-                                        <Button sx={{marginLeft: "auto"}} onClick={(e) => updateOutputPages()} variant="contained">Edit</Button>
-                                        <Button sx={{marginLeft: "auto"}} onClick={onDoneClick} variant="contained">Done</Button>
-                                    </Stack>:
-                                    <Stack direction='row'>
-                                        <Button sx={{marginLeft: "auto"}} onClick={onDoneClick} variant="contained">Done</Button>
-                                    </Stack>
-                                }
-                            </Box>
-                        </div>
-                        }          
+                        </div>       
                     </Stack>         
-                    <Backdrop
-                        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                        open={loading}
-                    >
-                        <CircularProgress size={60} color="inherit" />
-                    </Backdrop>
 
                     <ToastContainer
                         position="bottom-left"
@@ -467,6 +430,75 @@ export default function Admin(){
             
                 </Container >
             )
+        }else{
+           return(
+                <Container maxWidth="md" sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    p: { xs: 4, md: 10 },
+            
+                }}>
+                <Box sx={{ width:'%100', alignContent: "stretch", marginBottom: '10px'}}>
+                    <Stack direction='row'>
+                    <Button sx={{marginLeft: "auto"}} variant="contained" onClick={(e)=>{setAuthenticated(false)}}>LOGOUT</Button>
+                    </Stack>
+                </Box>
+
+                <Box sx={{ width:'%100', alignContent: "stretch", marginBottom: '10px'}}>
+                    <Stack direction='row'>
+                        <Typography variant="h15" component="div" >
+                            Configuration Page
+                        </Typography>
+                        <Button sx={{marginLeft: "auto"}} variant="outlined" onClick={(e)=>{setConfMode(ConfigurationMode.NoConfiguration);}}>Back</Button>
+                    </Stack>
+                </Box>
+
+                <Stack spacing={3}>
+        
+                    <TextField multiline rows={1} value={outputData.title} onChange={(e) => { setData({ ...outputData, 'title': e.target.value }) }} placeholder="Edit title" label="Title" variant="outlined" />
+                    <TextField multiline rows={10} value={outputData.description} onChange={(e) => { setData({ ...outputData, 'description': e.target.value }) }} placeholder="Edit description" label="Description" variant="outlined"/>
+
+                    <div>
+                        {outputData.outputs.map((output, index) =>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }} label="Input">
+                                <Stack spacing={2}>
+                                    <TextField sx={{width: '%80'}} value={output.name} tabIndex={index} onChange={changeHandlerOutputMode} id={FIELD_IDS.NAME} label={`Name ${index + 1}`} variant="outlined" />
+                                    <Stack direction='row' sx={{width: '%100'}}>
+                                        <TextField type="number"  value={output.constant} tabIndex={index} onChange={changeHandlerOutputMode} id={FIELD_IDS.CONSTANT} label={`Constant ${index + 1}`} variant="filled"/>
+                                    </Stack>
+                                </Stack>
+                            </Box>
+                        )}
+                        <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                            <Button color='primary' onClick={addOutputHandler} endIcon={<Add />}>Add Output</Button>
+                            <Button color='secondary' onClick={removeOutputHandler} endIcon={<Close />}>Remove Output</Button>
+                        </Box>
+                        <Box sx={{  width:'%100', alignContent: "stretch"}}>
+                            {(confMode === ConfigurationMode.EditMode)?
+                                <Stack direction='row'>
+                                    <Button sx={{marginLeft: "auto"}} onClick={(e) => updateOutputPages()} variant="contained">Edit</Button>
+                                    <Button sx={{marginLeft: "auto"}} onClick={onDoneClick} variant="contained">Done</Button>
+                                </Stack>:
+                                <Stack direction='row'>
+                                    <Button sx={{marginLeft: "auto"}} onClick={onDoneClick} variant="contained">Done</Button>
+                                </Stack>
+                            }
+                        </Box>
+                    </div>
+                </Stack>
+                <ToastContainer
+                    position="bottom-left"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    justifyContent='flex'
+                    newestOnTop={false}
+                    closeOnClick
+                    draggablePercent={50}
+                    pauseOnFocusLoss={false}
+                    draggable
+                />
+                </Container>
+            );
         }
     }else{
         //redirect

@@ -2,9 +2,8 @@ import React from 'react';
 import { Box, Button, Container, FormControl, Paper, Stack, TextField, Typography } from "@mui/material";
 import { AccountCircle, Lock } from "@mui/icons-material";
 import { useState} from 'react';
-import { toast} from 'react-toastify';
+import { toast, ToastContainer} from 'react-toastify';
 import { Navigate } from "react-router-dom";
-
 
 
 export default function Login(){
@@ -17,19 +16,18 @@ export default function Login(){
         'email': email,
         'password': password
       }
-      // let result = await fetch('http://127.0.0.1:8000/api/login', {
-      //   method: "POST",
-      //   headers: { 'Content-Type': "application/json" },
-      //   body: JSON.stringify(data)
-      // })
-      setLoggedIn(true);
-      // console.log(result);
-      // if (result.status === 200) {
-      //   setLoggedIn(true);
-      // } else {
-      //   toast.error('Failed to log in');
-      // }
-        
+      let result = await fetch('http://127.0.0.1:8000/api/login', {
+        method: "POST",
+        headers: { 'Content-Type': "application/json" },
+        body: JSON.stringify(data)
+      })
+
+      if (result.status === 200) {
+        setLoggedIn(true);
+      } else {
+        toast.error('Failed to log in');
+      }
+       //setLoggedIn(true); 
     }
     if (loggedIn){
       return <Navigate replace to="/admin" />;
@@ -63,6 +61,17 @@ export default function Login(){
             </Stack>
           </FormControl>
         </Paper>
+        <ToastContainer
+            position="bottom-left"
+            autoClose={5000}
+            hideProgressBar={false}
+            justifyContent='flex'
+            newestOnTop={false}
+            closeOnClick
+            draggablePercent={50}
+            pauseOnFocusLoss={false}
+            draggable
+        />
       </Container> 
     )
   }

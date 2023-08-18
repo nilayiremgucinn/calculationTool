@@ -1,9 +1,6 @@
-import { Backdrop, Button, CircularProgress, Container, FormControl, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Container, Stack, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
-import { toast, ToastContainer } from 'react-toastify';
-import { Navigate } from "react-router-dom";
-import { Add, Close } from '@mui/icons-material';
 import 'react-toastify/dist/ReactToastify.min.css';
 
 const DEFAULT_OUTPUT={
@@ -20,35 +17,21 @@ const DEFAULT_OUTPUT_PAGE ={
     outputs:[DEFAULT_OUTPUT]
 }
 
-export default function Output(totals){
+export default function Output(props){
     const [pageData, setPageData] = useState(DEFAULT_OUTPUT_PAGE);
 
-    let getOutputPages = async () => {
-        try {
-            let response = await fetch('http://127.0.0.1:8000/api/output', {
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            }).then(data => data.json());
-
-            setPageData(response[0]);
-        
-            toast.success("Input pages received.");
-        } catch (error) {
-            toast.error("Failed to get input page");
-        }
-    }
-
     useEffect(()=>{
-        getOutputPages();
-        console.log(pageData);
+        fetch('http://127.0.0.1:8000/api/output')
+            .then(data => data.json())
+            .then((newData) =>{
+                setPageData(newData[0]);
+            })
     }, []);
 
     return (
         <Box sx={{paddingTop: 25}}>
-            <Stack direction='row' alignItems='center' justifyContent='center'>
-                <Container alignItems='center'>
+            <Stack direction='row' sx={{alignContent: 'center', justifyContent: 'center'}}>
+                <Container sx={{alignContent: 'center'}}>
                     <img 
                         src={pageData.image}
                         alt="new"
@@ -59,20 +42,23 @@ export default function Output(totals){
                     flexDirection: 'column',
                     p: { xs: 4, md: 10 },
                     justifyContent: 'center',
-                    alignItems: 'center',
+                    alignContent: 'center',
                 }}>
                     <Stack spacing={5}>
-                        <Typography variant="h3" component="div">
+                        <Typography variant="h2" component="div">
                             {pageData.title}
                         </Typography>
 
-                        <Typography variant="subtitle2" component="div" key='description' >
+                        <Typography variant="subtitle1" component="div" >
                             {pageData.description}
                         </Typography>
-
-                        <Typography variant="subtitle2" component="div" key='description' >
-                            {parseInt(totals)}
-                        </Typography>
+                        {pageData.outputs.map((output, index) =>
+                            <Stack sx={{ display: 'flex', alignContent: 'flex-end'}} key={index}>
+                                <Typography variant="h4" component="div" >
+                                    {output.name}: {(parseInt(props.totals)+output.constant)}
+                                </Typography>
+                            </Stack>
+                        )}
 
                     </Stack>
                 </Container>

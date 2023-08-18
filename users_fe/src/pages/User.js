@@ -1,6 +1,6 @@
 import Output from "../components/Output";
 import { useEffect, useState } from "react";
-import { Button, Container,  Stack, TextField , Typography} from "@mui/material";
+import { Backdrop, Button, CircularProgress, Container,  Stack, TextField , Typography} from "@mui/material";
 import { Box } from "@mui/system";
 
 const DEFAULT_INPUT={
@@ -24,8 +24,9 @@ export default function User(){
     const [readyToCalculate, setReadyToCalculate] = useState(false);
     const [inputValues, setInputValues] = useState([]);
     const [outputTotal, setOutputTotal] = useState(0);
-    const [data, setData] = useState([])
+    const [data, setData] = useState([]);
     const [pageData, setPageData] = useState(DEFAULT_INPUT_PAGE);
+    const [loading, setLoading] = useState(true);
 
 
     const onClickNext = ()=> {
@@ -34,18 +35,18 @@ export default function User(){
         let total = 0;
     
         let input_data = pageData.inputs;
-        console.log(inputValues)
+        console.log(inputValues);
         input_data.forEach(input => {
             total += (input.coefficient * inputValues[index]);
             index += 1;
         });
         
-        setOutputTotal(outputTotal + total);
+        setOutputTotal((outputTotal + total));
         console.log(total);
+        console.log('dusuk yuzde', outputTotal);
         setNumberOfInputsEntered(numberOfInputsEntered + 1);
-        console.log(numberOfInputsEntered);
-        setPageData(data[numberOfInputsEntered]);
-        setInputValues([]);
+        setPageData(data[numberOfInputsEntered+1]);
+        setInputValues(Array(pageData.inputs.length).fill(0));
     }
 
     const onClickPrev = ()=> {
@@ -66,27 +67,29 @@ export default function User(){
     }
 
     const changeHandler = (event) => {
-        const index = event.target.key;
+        const index = event.target.tabIndex;
         const value = event.target.value;
 
         var input_data_ = [...inputValues];
-        input_data_[index] = parseInt(value);
+        input_data_[parseInt(index)] = parseInt(value);
         setInputValues(input_data_);
     }
 
     useEffect(()=>{
         fetch('http://127.0.0.1:8000/api/input')
             .then(data => data.json())
-            .then((data_arr) => {
-                setData(data_arr);
-                setPageData(data_arr[0]);
-                setInputValues(Array(pageData.inputs.length).fill(0));
+            .then((newData) =>{
+                console.log(newData);
+                setData(newData);
+                setPageData(newData[0]);
             });
-    }, [pageData.inputs.length]);
+        setInputValues(Array(pageData.inputs.length).fill(0));
+        setLoading(false);
+    }, []);
 
     switch(readyToCalculate){
         case true: // render output
-            return <Output outputTotal key='output'></Output>
+            return( <Output totals={outputTotal} key='output'></Output>)
         case false:
             return (
                 <Box sx={{paddingTop: 25}}>
@@ -108,13 +111,13 @@ export default function User(){
                                     {pageData.title}
                                 </Typography>
 
-                                <Typography variant="subtitle2" component="div" key='description' >
+                                <Typography variant="subtitle2" component="div">
                                     {pageData.description}
                                 </Typography>
 
                                 {pageData.inputs.map((input, index) =>
-                                    <Stack spacing={2} >
-                                        <TextField type="number" sx={{width: '%100'}} key={index} onChange={changeHandler} label={input.name} placeholder={input.placeholder} variant="outlined" />
+                                    <Stack spacing={2} key={index} >
+                                        <TextField type="number" sx={{width: '%100'}} tabIndex={index} onChange={changeHandler} label={input.name} placeholder={input.placeholder} variant="outlined" />
                                     </Stack>
                                 )}
                             </Stack>
@@ -125,14 +128,20 @@ export default function User(){
                                 }    
                                 {numberOfInputsEntered+1<data.length?
                                     <Button sx={{marginLeft: "auto"}} onClick={onClickNext} variant="contained">Next</Button>:
-                                    <Button sx={{marginLeft: "auto"}} onClick={(e) => {setReadyToCalculate(true)}} variant="contained">Calculate</Button>
+                                    <Button sx={{marginLeft: "auto"}} onClick={(e) => {setReadyToCalculate(true); console.log(outputTotal);}} variant="contained">Calculate</Button>
                                 }
                             </Box>
                         </Container>
+                        <Backdrop
+                            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                            open={loading}
+                        >
+                            <CircularProgress size={60} color="inherit" />
+                        </Backdrop> 
                     </Stack>
                 </Box>
             )
         default:
             break;
     }
-}   
+}
